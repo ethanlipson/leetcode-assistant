@@ -10,8 +10,24 @@ import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism.css'; //Example style, you can use another
 import { useEffect, useState } from 'react';
 
+type SubmissionResponse = {
+  'Overall Success': boolean;
+  'Test Results': {
+    Error: string;
+    Output: string;
+    Success: boolean;
+  }[];
+};
+
 export default function Home() {
-  const [code, setCode] = useState(`for i in range(5):\n    print(i)`);
+  const [code, setCode] =
+    useState(`def twoSum(nums: list[int], target: int) -> list[int]:
+  hashmap = {}
+  for index, num in enumerate(nums):
+      find = target - num
+      if find in hashmap:
+          return [hashmap[find], index]
+      hashmap[num] = index + 10000`);
   const [problemStatement, setProblemStatement] = useState(
     'Implement a matrix multiplication algorithm running in O(n^2) time'
   );
@@ -19,6 +35,20 @@ export default function Home() {
     'Try starting with an O(n^3) algorithm and then optimizing it'
   );
   const [gptAdviceDisplayedLength, setGptAdviceDisplayedLength] = useState(0);
+  const [submissionResponse, setSubmissionResponse] =
+    useState<SubmissionResponse | null>(null);
+
+  function submitCode() {
+    fetch('http://192.168.0.61:3001/test_code', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code, language: 'python3' }),
+    })
+      .then(response => response.json())
+      .then(data => setSubmissionResponse(data));
+  }
 
   useEffect(() => {
     function revealAdvice() {
@@ -39,18 +69,6 @@ export default function Home() {
     }
 
     revealAdvice();
-  }, []);
-
-  useEffect(() => {
-    fetch('http://192.168.1.122:3000/test_code', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ code, language: 'python3' }),
-    })
-      .then(response => response.json())
-      .then(data => console.log(data));
   }, []);
 
   return (
@@ -75,14 +93,23 @@ export default function Home() {
           />
         </div>
         <div className="grow basis-0 flex flex-row gap-4">
-          <button className="h-full w-24 bg-green-600 hover:bg-green-700 active:bg-green-800 rounded text-white">
+          <button
+            className="h-full w-24 bg-green-600 hover:bg-green-700 active:bg-green-800 rounded text-white"
+            onClick={submitCode}
+          >
             Test
           </button>
           <button className="h-full w-24 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded text-white">
             Submit
           </button>
           <div className="grow" />
-          <button className="h-full w-24 text-red-400">Error!</button>
+          {submissionResponse === null ? null : submissionResponse[
+              'Overall Success'
+            ] ? (
+            <div className="h-full w-24 text-green-400">Success!</div>
+          ) : (
+            <div className="h-full w-24 text-red-400">Error!</div>
+          )}
         </div>
       </div>
       <div className="grow-[2] basis-0">

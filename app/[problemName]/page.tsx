@@ -21,6 +21,8 @@ type SubmissionResponse = {
   }[];
 };
 
+type Results = {};
+
 export default function IDE() {
   const params = useParams();
 
@@ -40,6 +42,8 @@ export default function IDE() {
   const [submissionResponse, setSubmissionResponse] =
     useState<SubmissionResponse | null>(null);
   const [audioChunks, setAudioChunks] = useState([] as Blob[]);
+  const [results, setResults] = useState<Results | null>(null);
+  const [resultsLoading, setResultsLoading] = useState(false);
 
   function testCode() {
     fetch('http://192.168.1.122:3001/test_code', {
@@ -57,7 +61,7 @@ export default function IDE() {
       .then(data => setSubmissionResponse(data));
   }
 
-  function submitCode() {
+  async function submitCode() {
     const blob = new Blob(audioChunks, { type: 'audio/webm' });
     console.log(blob.size);
 
@@ -65,11 +69,16 @@ export default function IDE() {
     const formData = new FormData();
     formData.append('file', blob, 'audio.webm');
     formData.append('code', code);
+    formData.append('problemName', params.problemName as string);
+
+    setResultsLoading(true);
 
     fetch('http://192.168.1.122:3001/submit', {
       method: 'POST',
       body: formData,
-    });
+    })
+      .then(response => response.json())
+      .then(data => setResults(data));
   }
 
   useEffect(() => {
@@ -129,7 +138,7 @@ ${data.response}`
     test => !test.Success
   );
 
-  return (
+  const ide = (
     <main className="p-8 h-svh flex flex-row gap-4 bg-gray-200 text-sm">
       <div className="grow-[3] basis-0 flex flex-col gap-4">
         <div className="grow-[3] basis-0">
@@ -187,4 +196,15 @@ ${data.response}`
       </div>
     </main>
   );
+
+  const loadingPage = (
+    <main className="p-8 h-svh flex items-center justify-center text-4xl bg-gray-200">
+      xx
+      <h2>Loading...</h2>
+    </main>
+  );
+
+  const resultsPage = <></>;
+
+  return results ? resultsPage : resultsLoading ? loadingPage : ide;
 }

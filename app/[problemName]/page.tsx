@@ -9,6 +9,7 @@ import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism.css';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 
 type SubmissionResponse = {
   'Overall Success': boolean;
@@ -21,7 +22,10 @@ type SubmissionResponse = {
   }[];
 };
 
-type Results = {};
+type Results = {
+  feedback: string[];
+  tests: [number, number];
+};
 
 export default function IDE() {
   const params = useParams();
@@ -199,12 +203,40 @@ ${data.response}`
 
   const loadingPage = (
     <main className="p-8 h-svh flex items-center justify-center text-4xl bg-gray-200">
-      xx
       <h2>Loading...</h2>
     </main>
   );
 
-  const resultsPage = <></>;
+  const resultsPage = results && (
+    <main className="p-8 h-svh flex flex-col items-center bg-gray-200">
+      <h2 className="text-4xl mt-16">
+        You passed{' '}
+        <span
+          className={
+            results.tests[0] === results.tests[1]
+              ? 'text-green-600'
+              : 'text-yellow-500'
+          }
+        >
+          {results.tests[0]}
+        </span>
+        /{results.tests[1]} tests
+      </h2>
+      <h4 className="text-2xl mt-8 underline">Feedback</h4>
+      <ul className="list-disc w-2/3">
+        {results.feedback.map((f, i) => (
+          <li key={i} className="mt-4">
+            {f}
+          </li>
+        ))}
+      </ul>
+      <Link href="/">
+        <button className="p-4 bg-green-600 hover:bg-green-700 active:bg-green-800 mt-8 rounded text-white">
+          Go Home
+        </button>
+      </Link>
+    </main>
+  );
 
   return results ? resultsPage : resultsLoading ? loadingPage : ide;
 }

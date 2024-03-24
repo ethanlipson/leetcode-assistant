@@ -59,11 +59,12 @@ export default function IDE() {
   }
 
   function submitCode() {
-    const blob = new Blob(audioChunks, { type: 'audio/m4a' });
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    console.log(blob.size);
 
     // submit audio blob and code
     const formData = new FormData();
-    formData.append('file', blob, 'audio.m4a');
+    formData.append('file', blob, 'audio.webm');
     formData.append('code', code);
 
     fetch('http://192.168.0.61:3001/submit', {
@@ -82,6 +83,7 @@ export default function IDE() {
       rec.ondataavailable = e => {
         setAudioChunks(chunks => [...chunks, e.data]);
       };
+      rec.start(1000);
     });
   }, []);
 

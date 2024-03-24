@@ -1,0 +1,22 @@
+{
+    "problem": "Valid_Anagram",
+    "Valid_Anagram":
+    {
+        "description": "Given two strings s and t, return true if t is an anagram of s, and false otherwise.\nAn Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.",
+        "toTest": "validAnagram",
+        "tests": [
+            {
+                "visible": 1,
+                "parameters": ["rat", "tar"],
+                "output": "True"
+    
+            },
+            {
+                "visible": 1,
+                "parameters": ["asdf", "notAnagram"],
+                "output": "False"
+    
+            }
+        ]
+    }
+}

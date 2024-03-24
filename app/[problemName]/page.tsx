@@ -3,11 +3,10 @@
 import Editor from 'react-simple-code-editor';
 // @ts-ignore
 import { highlight, languages } from 'prismjs/components/prism-core';
-// const { highlight, languages } = require('prismjs/components/prism-core');
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-python';
-import 'prismjs/themes/prism.css'; //Example style, you can use another
+import 'prismjs/themes/prism.css';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
@@ -43,7 +42,7 @@ export default function IDE() {
   const [audioChunks, setAudioChunks] = useState([] as Blob[]);
 
   function testCode() {
-    fetch('http://192.168.0.61:3001/test_code', {
+    fetch('http://192.168.1.122:3001/test_code', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,14 +66,14 @@ export default function IDE() {
     formData.append('file', blob, 'audio.webm');
     formData.append('code', code);
 
-    fetch('http://192.168.0.61:3001/submit', {
+    fetch('http://192.168.1.122:3001/submit', {
       method: 'POST',
       body: formData,
     });
   }
 
   useEffect(() => {
-    fetch(`http://192.168.0.61:3001/get_question_${params.problemName}`)
+    fetch(`http://192.168.1.122:3001/get_question_${params.problemName}`)
       .then(response => response.json())
       .then(data => setProblemStatement(data));
 
@@ -89,7 +88,7 @@ export default function IDE() {
 
   useEffect(() => {
     setTimeout(() => {
-      fetch('http://192.168.0.61:3001/cycle_help', {
+      fetch('http://192.168.1.122:3001/cycle_help', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
